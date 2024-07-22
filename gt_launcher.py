@@ -11,6 +11,8 @@ from disropt.utils.utilities import is_pos_def
 from disropt.utils.graph_constructor import binomial_random_graph, metropolis_hastings
 from disropt.problems.problem import Problem
 
+import parameters
+
 RESULTS_DIR = "gt_results"
 
 # get MPI info
@@ -48,15 +50,19 @@ agent.set_problem(pb)
 
 initial_condition = 10*np.random.rand(n, 1)
 
-algorithm = GradientTracking(agent=agent,
-                             initial_condition=initial_condition,
-                             enable_log=True)
-
+algorithm = GradientTracking(
+    agent=agent,
+    initial_condition=initial_condition,
+    enable_log=True
+)
 
 # run the algorithm
 start_time = time.time()
 sequence = algorithm.run(
-    iterations=2000, stepsize=lambda k: 1/((k+1)**0.51), verbose=True)
+    iterations=parameters.GT_iterations,
+    stepsize=parameters.GT_stepsize,
+    verbose=True
+)
 end_time = time.time()
 print(f"Agent {agent.id}: {algorithm.get_result().flatten()}")
 

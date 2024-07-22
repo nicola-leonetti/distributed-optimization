@@ -6,6 +6,7 @@ from disropt.agents.agent import Agent
 from disropt.algorithms import Algorithm
 from disropt.problems import Problem
 
+import parameters
 
 class ADMMTrackingGradient(Algorithm):
     """ADMM-Tracking Gradient

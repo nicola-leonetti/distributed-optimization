@@ -9,6 +9,7 @@ from disropt.functions import Variable, QuadraticForm
 from disropt.problems import Problem
 from disropt.utils.graph_constructor import binomial_random_graph
 
+import parameters
 from admm_tracking_gradient import ADMMTrackingGradient
 
 RESULTS_DIR = "admm_results"
@@ -48,11 +49,21 @@ initial_condition = 10*np.random.rand(n, 1)
 initial_z_values = {i: 10*np.random.rand(2*n, 1) for i in agent.in_neighbors}
 
 algorithm = ADMMTrackingGradient(
-    agent, initial_condition, initial_z_values, gamma=0.1, enable_log=True)
+    agent,
+    initial_condition,
+    initial_z_values,
+    parameters.ADMM_gamma,
+    parameters.ADMM_rho,
+    parameters.ADMM_alpha,
+    enable_log=True
+)
 
 start_time = time.time()
 sequence = algorithm.run(
-    iterations=2000, stepsize=lambda k: 1/((k+1)**0.51), verbose=True)
+    iterations=parameters.ADMM_iterations,
+    stepsize=parameters.ADMM_stepsize,
+    verbose=True
+)
 end_time = time.time()
 
 print(f"Agent {agent.id}: {algorithm.get_result().flatten()}")

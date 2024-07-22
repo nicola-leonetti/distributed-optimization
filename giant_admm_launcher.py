@@ -9,6 +9,7 @@ from disropt.functions import Variable, QuadraticForm
 from disropt.problems import Problem
 from disropt.utils.graph_constructor import binomial_random_graph
 
+import parameters
 from giant_admm import GIANTADMM
 
 RESULTS_DIR = "giant_admm_results"
@@ -47,11 +48,21 @@ initial_condition = 10*np.random.rand(n, 1)
 initial_z_values = {i: 10*np.random.rand(2*n, 1) for i in agent.in_neighbors}
 
 algorithm = GIANTADMM(
-    agent, initial_condition, initial_z_values, gamma=0.01, enable_log=True)
+    agent,
+    initial_condition,
+    initial_z_values,
+    parameters.GIANT_gamma,
+    parameters.GIANT_rho,
+    parameters.GIANT_alpha,
+    enable_log=True
+)
 
 start_time = time.time()
 sequence = algorithm.run(
-    iterations=2000, stepsize=lambda k:  0.05, verbose=True)
+    iterations=parameters.GIANT_iterations,
+    stepsize=parameters.GIANT_stepsize,
+    verbose=True
+)
 end_time = time.time()
 
 print(f"Agent {agent.id}: {algorithm.get_result().flatten()}")
