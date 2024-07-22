@@ -4,6 +4,6 @@ __pycache__
 
 *.npy
 *.pkl
-*_results
+*_results/*
 
 TODO.md
