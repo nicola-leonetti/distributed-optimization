@@ -1,4 +1,3 @@
-# TODO I risultati sono sbagliati: correggere
 import numpy as np
 
 from disropt.agents import Agent

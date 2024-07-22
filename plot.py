@@ -1,11 +1,3 @@
-# TODO Confronto la norma della differenza tra x corrente e  star
-# con scala logaritmica su asse y
-# TODO Faccio tuning dei parametri
-# TODO Studiare logistic regression da paper
-# TODO (parla con Carnevale)
-# TODO Confronta gli algoritmi per capire come si comporano con un
-# linear classifier (logistic regression)
-
 import dill as pickle
 import matplotlib.pyplot as plt
 import numpy as np
