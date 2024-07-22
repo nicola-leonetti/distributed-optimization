@@ -34,22 +34,13 @@ print(f"ADMM: {admm_sequence[0][-1].flatten()}")
 print(f"GIANT-ADMM: {giant_admm_sequence[0][-1].flatten()}")
 
 
-def get_loss_sequence(sequence):
-    """
-    For each sequence, it returns a sequence of elements 
-    [iteration, norm(estimate[iteration] - actual_solution)]
-    """
-    loss_sequence = {}
-    norm = np.linalg.norm
-    
-
-
 norm = np.linalg.norm
 iterations = gt_sequence[0].shape[0]
 # for each agent
+gt_loss_sequence = []
 for i in range(N):
-    gt_loss_sequence[i] = [norm(gt_sequence[i][iteration - 1, :, :] - actual_solution)
-                           for iteration in range(iterations)]
+    gt_loss_sequence.append([norm(gt_sequence[i][iteration - 1, :, :] - actual_solution)
+                             for iteration in range(iterations)])
 
 titles = [
     "Gradient tracking",

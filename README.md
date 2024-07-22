@@ -1,4 +1,4 @@
-# Esempi disropt
+# Distributed optimization
 Estensione della libreria [disropt](https://github.com/OPT4SMART/disropt.git) 
 che implementa gli algoritmi ADMM-Tracking Gradient e GIANT-ADMM.
 
@@ -14,16 +14,32 @@ Per attivarlo:
 ```bash
 source env/bin/activate
 ```
+Per installare le dependencies necessarie
+```bash
+pip3 install -r requirements.txt
+```
 Per disattivarlo:
 ```bash
 deactivate
 ```
 
 ## Eseguire gli script disropt
+Creare le directory che ospitano i risultati:
 ```bash
-mpirun -np 8 python script.py
+mkdir giant_admm_results
+mkdir gt_results
+mkdir admm_results
 ```
-Dove 8 è il numero di processori e script.py è il nome dello script che ho scritto
+Eseguire lo script:
+```bash
+mpirun -np 8 python3 script.py
+```
+Dove 8 è il numero di processori e script.py è il nome dello script
+
+## Plot dei risultati
+```bash
+python3 plot.py
+```
 
 ## Note di teoria
 Tre setup possibili per un algoritmo di ottimizzazione distribuita:

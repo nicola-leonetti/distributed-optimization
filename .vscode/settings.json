@@ -3,5 +3,11 @@
     "editor.rulers": [
         72,
         79
-    ]
+    ],
+    // Ignoro import mancanti, dal momento che pylance non riesce a 
+    // trovare i moduli installati nel virtual environment
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportMissingImports": "none",
+        "reportMissingModuleSource": "none",
+    }
 }
