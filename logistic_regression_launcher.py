@@ -26,114 +26,99 @@ from disropt.problems import Problem
 
 from admm_tracking_gradient import ADMMTrackingGradient
 from giant_admm import GIANTADMM
+from logistic_regression_parameters import *
 
-NN = MPI.COMM_WORLD.Get_size()
+
+def log_once(s):
+    if agent_id == 0:
+        print(s)
+
+
+number_of_agents = MPI.COMM_WORLD.Get_size()
 agent_id = MPI.COMM_WORLD.Get_rank()
 
-# Genero un grafo random ma comune a tutti gli agenti
-Adj = binomial_random_graph(NN, p=0.3, seed=1)
-W = metropolis_hastings(Adj)
-
-# Genero numeri random per ogni agente
+# Generate a random graph, common to all agents, and the corresponding
+# weights matrix
+graph = binomial_random_graph(number_of_agents, p=0.3, seed=1)
+W = metropolis_hastings(graph)
+# Initialize a different RNG for each agent
 np.random.seed(10*agent_id)
 
-# Genero i parametri di una gaussiana
+# Gaussian parameters
 mu = (np.array([0, 0]).transpose(), np.array([3, 2]).transpose())
 sigma = (np.eye(2), np.eye(2))
 
-# dimension of sample space
-dim = mu[0].shape[0]
+sample_space_dimension = mu[0].shape[0]
 
-# number of samples (min 2 max 5 for each label)
-number_of_samples = (np.random.randint(2, 6), np.random.randint(2, 6))
+number_of_samples_range = (np.random.randint(2, 6), np.random.randint(2, 6))
 
-# Parametro di regolarizzazione
+# Regularization parameter
 C = 10
 
-# Genera i punti
-points = np.zeros((dim, number_of_samples[0] + number_of_samples[1]))
-points[:, 0:number_of_samples[0]] = np.random.multivariate_normal(
-    mu[0], sigma[0], number_of_samples[0]).transpose()
-points[:, number_of_samples[0]:] = np.random.multivariate_normal(
-    mu[1], sigma[1], number_of_samples[1]).transpose()
+# Generate the agent's points
+points = np.zeros((sample_space_dimension,
+                  number_of_samples_range[0] + number_of_samples_range[1]))
+points[:, 0:number_of_samples_range[0]] = np.random.multivariate_normal(
+    mu[0], sigma[0], number_of_samples_range[0]).transpose()
+points[:, number_of_samples_range[0]:] = np.random.multivariate_normal(
+    mu[1], sigma[1], number_of_samples_range[1]).transpose()
 
-# Genera i label
-labels = np.ones((sum(number_of_samples), 1))
-labels[number_of_samples[0]:] = -labels[number_of_samples[0]:]
+# Label each point 1 or -1 randomly
+labels = np.ones((sum(number_of_samples_range), 1))
+labels[number_of_samples_range[0]:] = -labels[number_of_samples_range[0]:]
 
-# Genera la funzione costo
-z = Variable(dim+1)
-A = np.ones((dim+1, 1))
+# Initialize the problem's cost function, based on the agent's points
+z = Variable(sample_space_dimension+1)
+A = np.ones((sample_space_dimension+1, 1))
 A[-1] = 0
-obj_func = (C / (2 * NN)) * SquaredNorm(A @ z)
-
-for j in range(sum(number_of_samples)):
-    e_j = np.zeros((sum(number_of_samples), 1))
+obj_func = (C / (2 * number_of_agents)) * SquaredNorm(A @ z)
+for j in range(sum(number_of_samples_range)):
+    e_j = np.zeros((sum(number_of_samples_range), 1))
     e_j[j] = 1
     A_j = np.vstack((points @ e_j, 1))
     obj_func += Logistic(- labels[j] * A_j @ z)
 
-#####################
-# Distributed algorithms
-#####################
-
-# Inizializzo agente e problema
 agent = Agent(
-    in_neighbors=np.nonzero(Adj[agent_id, :])[0].tolist(),
-    out_neighbors=np.nonzero(Adj[:, agent_id])[0].tolist(),
+    in_neighbors=np.nonzero(graph[agent_id, :])[0].tolist(),
+    out_neighbors=np.nonzero(graph[:, agent_id])[0].tolist(),
     in_weights=W[agent_id, :].tolist()
 )
-pb = Problem(obj_func)
-agent.set_problem(pb)
+problem = Problem(obj_func)
+agent.set_problem(problem)
 
-# instantiate the algorithms
-x0 = 5*np.random.rand(dim+1, 1)
+# Initialize the agents' initial conditions with random values
+x0 = 5*np.random.rand(sample_space_dimension+1, 1)
 
-iterations = 2000
-def GT_stepsize(k): return 0.001
-
-
-# ADMM-Tracking Gradient parameters
-ADMM_gamma = 0.9
-ADMM_rho = 0.3
-ADMM_alpha = 0.9
-def ADMM_stepsize(k): return 0.5
-
-
-# GIANT-ADMM parameters
-GIANT_gamma = 0.5
-GIANT_rho = 0.9
-GIANT_alpha = 0.9
-def GIANT_stepsize(k): return 0.5
-
+# Number of iterations for all the algorithms
+iterations = 1000
 
 gradient_tracking = GradientTracking(
     agent=agent,
     initial_condition=x0,
     enable_log=True
 )
-
+initial_z = {i: 10*np.random.rand(2*(sample_space_dimension+1), 1)
+             for i in agent.in_neighbors}
 ADMM_tracking_gradient = ADMMTrackingGradient(
     agent=agent,
     initial_condition=x0,
-    initial_z={i: 10*np.random.rand(2*(dim+1), 1) for i in agent.in_neighbors},
+    initial_z=initial_z,
     gamma=GIANT_gamma,
     rho=GIANT_rho,
     alpha=GIANT_alpha,
     enable_log=True
 )
-
 GIANT_ADMM = GIANTADMM(
     agent=agent,
     initial_condition=x0,
-    initial_z={i: 10*np.random.rand(2*(dim+1), 1) for i in agent.in_neighbors},
+    initial_z=initial_z,
     gamma=GIANT_gamma,
     rho=GIANT_rho,
     alpha=GIANT_alpha,
     enable_log=True
 )
 
-# run the algorithms
+# Run the algorithms
 gt_sequence = gradient_tracking.run(
     iterations=iterations, stepsize=GT_stepsize)
 ADMM_sequence = ADMM_tracking_gradient.run(
@@ -146,17 +131,19 @@ print(f"ADMM-Tracking Gradient: agent {agent_id}: {
     ADMM_tracking_gradient.get_result().flatten()}")
 # print(f"GIANT-ADMM: agent {agent_id}: {GIANT_ADMM.get_result().flatten()}")
 
-# Salvo numero di agenti, dimensione dello spazio e iterazioni in "info.pkl
+# Saving:
+# - the number of agents, the size of the space and the number of
+#   iterations in "info.pkl"
+# - the function of the i-th agent in "agent_i_func.pkl"
+# - solution sequences for the various algoritgms
 if agent_id == 0:
     with open('info.pkl', 'wb') as output:
-        pickle.dump({'N': NN, 'size': dim+1, 'iterations': iterations},
+        pickle.dump({'N': number_of_agents, 'size': sample_space_dimension+1, 'iterations': iterations},
                     output, pickle.HIGHEST_PROTOCOL)
 
-# Salvo la funzione relativa all'agente i-esimo in "agent_i_func.pkl"
 with open(f'agent_{agent_id}_func.pkl', 'wb') as output:
     pickle.dump(obj_func, output, pickle.HIGHEST_PROTOCOL)
 
-# Salvo la sequenza di soluzioni del Gradient-Tracking in "agent_i_seq_gradtr.npy"
 np.save(f"agent_{agent_id}_seq_gradtr.npy", np.squeeze(gt_sequence))
 np.save(f"agent_{agent_id}_seq_admm.npy", np.squeeze(ADMM_sequence))
 # np.save(f"agent_{agent_id}_seq_giant.npy", np.squeeze(GIANT_sequence))
