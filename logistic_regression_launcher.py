@@ -98,9 +98,9 @@ ADMM_tracking_gradient = ADMMTrackingGradient(
     agent=agent,
     initial_condition=x0,
     initial_z=initial_z,
-    gamma=GIANT_gamma,
-    rho=GIANT_rho,
-    alpha=GIANT_alpha,
+    gamma=ADMM_gamma,
+    rho=ADMM_rho,
+    alpha=ADMM_alpha,
     enable_log=True
 )
 GIANT_ADMM = GIANTADMM(

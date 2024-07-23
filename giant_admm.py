@@ -1,5 +1,5 @@
 import numpy as np
-import time
+import scipy
 
 from disropt.agents import Agent
 from disropt.algorithms import Algorithm
@@ -44,8 +44,5 @@ class GIANTADMM(ADMMTrackingGradient):
         Args:
             x: point on which to calculate inverse hessian
         """
-        start = time.time()
-        result = np.linalg.inv(
+        return scipy.linalg.inv(
             self.agent.problem.objective_function.hessian(x))
-        print(f"Time taken for inverse hessian: {round(time.time()-start, 3)}")
-        return result
