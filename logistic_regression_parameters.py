@@ -1,4 +1,8 @@
+RESULTS_DIR = "logistic_regression_results"
+
 # Gradient-Tracking parameters
+
+
 def GT_stepsize(k): return 0.001
 
 

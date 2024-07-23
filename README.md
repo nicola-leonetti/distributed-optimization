@@ -29,6 +29,7 @@ Creare le directory che ospitano i risultati:
 mkdir giant_admm_results
 mkdir gt_results
 mkdir admm_results
+mkdir logistic_regression_results
 ```
 Eseguire lo script:
 ```bash

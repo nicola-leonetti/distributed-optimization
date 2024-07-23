@@ -1,10 +1,14 @@
-import numpy as np
+import os
+
 import matplotlib.pyplot as plt
-from disropt.problems import Problem
+import numpy as np
 import pickle
+from disropt.problems import Problem
+
+from logistic_regression_parameters import *
 
 # initialize
-with open('info.pkl', 'rb') as inp:
+with open(os.path.join(RESULTS_DIR, 'info.pkl'), 'rb') as inp:
     info = pickle.load(inp)
 NN = info['N']
 iters = info['iterations']
@@ -15,9 +19,11 @@ ADMM_sequence = np.zeros((NN, iters, size))
 gt_sequence = np.zeros((NN, iters, size))
 local_function = {}
 for i in range(NN):
-    ADMM_sequence[i, :, :] = np.load("agent_{}_seq_admm.npy".format(i))
-    gt_sequence[i, :, :] = np.load("agent_{}_seq_gradtr.npy".format(i))
-    with open('agent_{}_func.pkl'.format(i), 'rb') as inp:
+    ADMM_sequence[i, :, :] = np.load(os.path.join(
+        RESULTS_DIR, f"agent_{i}_seq_admm.npy"))
+    gt_sequence[i, :, :] = np.load(os.path.join(
+        RESULTS_DIR, f"agent_{i}_seq_gradtr.npy"))
+    with open(os.path.join(RESULTS_DIR, f'agent_{i}_func.pkl'), 'rb') as inp:
         local_function[i] = pickle.load(inp)
 
 # solve centralized problem
