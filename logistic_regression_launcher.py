@@ -53,9 +53,6 @@ sample_space_dimension = mu[0].shape[0]
 
 number_of_samples_range = (np.random.randint(2, 6), np.random.randint(2, 6))
 
-# Regularization parameter
-C = 10
-
 # Generate the agent's points
 points = np.zeros((sample_space_dimension,
                   number_of_samples_range[0] + number_of_samples_range[1]))
@@ -89,9 +86,6 @@ agent.set_problem(problem)
 
 # Initialize the agents' initial conditions with random values
 x0 = 5*np.random.rand(sample_space_dimension+1, 1)
-
-# Number of iterations for all the algorithms
-iterations = 1000
 
 gradient_tracking = GradientTracking(
     agent=agent,

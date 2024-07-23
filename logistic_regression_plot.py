@@ -8,7 +8,7 @@ from disropt.problems import Problem
 
 from logistic_regression_parameters import *
 
-# initialize
+# Load number of agents, iterations and variable size from info.pkl
 with open(os.path.join(RESULTS_DIR, 'info.pkl'), 'rb') as inp:
     info = pickle.load(inp)
 number_of_agents = info['N']
@@ -40,6 +40,10 @@ global_problem = Problem(global_obj_func)
 problem_solution = global_problem.solve()
 cost_centr = global_obj_func.eval(problem_solution)
 problem_solution = problem_solution.flatten()
+
+print(f"Actual solution: {problem_solution}")
+print(f"Gradient tracking solution: {gt_sequence[0][-1].flatten()}")
+print(f"ADMM-Tracking Gradient solution: {ADMM_sequence[0][-1].flatten()}")
 
 # compute cost errors
 cost_err_admm = np.zeros((number_of_agents, iters))
