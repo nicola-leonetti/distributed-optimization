@@ -7,7 +7,7 @@ iterations = 2000  # Number of iterations
 # Gradient-Tracking parameters
 
 
-def GT_stepsize(k): return 0.001
+def GT_stepsize(k): return 0.01
 
 
 # ADMM-Tracking Gradient parameters
@@ -19,6 +19,6 @@ def ADMM_stepsize(k): return 0.1
 
 # GIANT-ADMM parameters
 GIANT_gamma = 0.5
-GIANT_rho = 0.9
+GIANT_rho = 0.3
 GIANT_alpha = 0.9
-def GIANT_stepsize(k): return 0.5
+def GIANT_stepsize(k): return 0.001
