@@ -1,4 +1,5 @@
 import os
+import warnings
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -10,15 +11,15 @@ from logistic_regression_parameters import *
 # initialize
 with open(os.path.join(RESULTS_DIR, 'info.pkl'), 'rb') as inp:
     info = pickle.load(inp)
-NN = info['N']
+number_of_agents = info['N']
 iters = info['iterations']
 size = info['size']
 
 # load agent data
-ADMM_sequence = np.zeros((NN, iters, size))
-gt_sequence = np.zeros((NN, iters, size))
+ADMM_sequence = np.zeros((number_of_agents, iters, size))
+gt_sequence = np.zeros((number_of_agents, iters, size))
 local_function = {}
-for i in range(NN):
+for i in range(number_of_agents):
     ADMM_sequence[i, :, :] = np.load(os.path.join(
         RESULTS_DIR, f"agent_{i}_seq_admm.npy"))
     gt_sequence[i, :, :] = np.load(os.path.join(
@@ -28,8 +29,12 @@ for i in range(NN):
 
 # solve centralized problem
 global_obj_func = 0
-for i in range(NN):
+for i in range(number_of_agents):
     global_obj_func += local_function[i]
+
+# Suppress the warning about solving the problem with ECOS solver by
+# default
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
 global_problem = Problem(global_obj_func)
 problem_solution = global_problem.solve()
@@ -37,23 +42,24 @@ cost_centr = global_obj_func.eval(problem_solution)
 problem_solution = problem_solution.flatten()
 
 # compute cost errors
-cost_err_admm = np.zeros((NN, iters))
-cost_err_gradtr = np.zeros((NN, iters))
+cost_err_admm = np.zeros((number_of_agents, iters))
+cost_err_gradtr = np.zeros((number_of_agents, iters))
 
-for i in range(NN):
+for i in range(number_of_agents):
     for t in range(iters):
         # first compute global function value at local point
         cost_ii_tt_admm = 0
         cost_ii_tt_gradtr = 0
-        for j in range(NN):
+        for j in range(number_of_agents):
             cost_ii_tt_admm += local_function[j].eval(
                 ADMM_sequence[i, t, :][:, None])
             cost_ii_tt_gradtr += local_function[j].eval(
                 gt_sequence[i, t, :][:, None])
 
         # then compute errors
-        cost_err_admm[i, t] = abs(cost_ii_tt_admm - cost_centr)
-        cost_err_gradtr[i, t] = abs(cost_ii_tt_gradtr - cost_centr)
+        cost_err_admm[i, t] = abs(cost_ii_tt_admm.item() - cost_centr.item())
+        cost_err_gradtr[i, t] = abs(
+            cost_ii_tt_gradtr.item() - cost_centr.item())
 
 # plot maximum cost error
 plt.figure()
