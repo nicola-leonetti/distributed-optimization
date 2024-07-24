@@ -30,11 +30,6 @@ from giant_admm import GIANTADMM
 from logistic_regression_parameters import *
 
 
-def log_once(s):
-    if agent_id == 0:
-        print(s)
-
-
 number_of_agents = MPI.COMM_WORLD.Get_size()
 agent_id = MPI.COMM_WORLD.Get_rank()
 
@@ -114,19 +109,11 @@ GIANT_ADMM = GIANTADMM(
 )
 
 # Run the algorithms
-log_once("Running Gradient-Tracking...")
 gt_sequence = gradient_tracking.run(
     iterations=iterations, stepsize=GT_stepsize)
-log_once("Done with Gradient-Tracking")
-
-log_once("Running ADMM-Tracking Gradient...")
 ADMM_sequence = ADMM_tracking_gradient.run(
     iterations=iterations, stepsize=ADMM_stepsize)
-log_once("Done with ADMM-Tracking Gradient")
-
-log_once("Running GIANT-ADMM...")
 GIANT_sequence = GIANT_ADMM.run(iterations=iterations, stepsize=GIANT_stepsize)
-log_once("Done with GIANT-ADMM")
 
 print(f"Gradient tracking: agent {agent_id}: {
       gradient_tracking.get_result().flatten()}")

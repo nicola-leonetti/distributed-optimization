@@ -2,7 +2,7 @@ RESULTS_DIR = "logistic_regression_results"
 
 # General
 C = 10  # Regularization parameter
-iterations = 1000  # Number of iterations
+iterations = 2000  # Number of iterations
 
 # Gradient-Tracking parameters
 
@@ -18,7 +18,7 @@ def ADMM_stepsize(k): return 0.1
 
 
 # GIANT-ADMM parameters
-GIANT_gamma = 0.8
-GIANT_rho = 0.05
-GIANT_alpha = 0.7
-def GIANT_stepsize(k): return 0.0055
+GIANT_gamma = 0.25
+GIANT_rho = 1.2
+GIANT_alpha = 0.9
+def GIANT_stepsize(k): return 0.047
