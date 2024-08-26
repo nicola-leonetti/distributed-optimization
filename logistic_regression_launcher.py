@@ -49,6 +49,10 @@ sample_space_dimension = mu[0].shape[0]
 number_of_samples_range = (np.random.randint(2, 6), np.random.randint(2, 6))
 
 # Generate the agent's points
+# For each of those, a multivariate (2D) normal distribution is
+# used, meaning that each of those points will be generated in a 2D
+# space around a certain mean point. In this way, two clusters of point
+# will be formed
 points = np.zeros((sample_space_dimension,
                   number_of_samples_range[0] + number_of_samples_range[1]))
 points[:, 0:number_of_samples_range[0]] = np.random.multivariate_normal(
