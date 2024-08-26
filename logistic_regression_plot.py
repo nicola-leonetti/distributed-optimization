@@ -12,7 +12,7 @@ from logistic_regression_parameters import *
 with open(os.path.join(RESULTS_DIR, 'info.pkl'), 'rb') as inp:
     info = pickle.load(inp)
 number_of_agents = info['N']
-iters = info['iterations']
+iters = info['iterations'] + 1
 size = info['size']
 
 # load agent data
@@ -106,6 +106,7 @@ plt.semilogy(np.arange(iters), np.amax(
     gt_solution_error, axis=0), label='Gradient Tracking')
 plt.semilogy(np.arange(iters), np.amax(
     giant_solution_error, axis=0), label='GIANT-ADMM')
+
 plt.legend()
 
 plt.show()

@@ -80,6 +80,9 @@ problem = Problem(obj_func)
 agent.set_problem(problem)
 
 # Initialize the agents' initial conditions with random values
+# In order to make the simulation fair, each agent should start with the
+# same random value as its initial condition
+np.random.seed(sample_space_dimension)
 x0 = 5*np.random.rand(sample_space_dimension+1, 1)
 
 gradient_tracking = GradientTracking(
@@ -115,6 +118,11 @@ ADMM_sequence = ADMM_tracking_gradient.run(
     iterations=iterations, stepsize=ADMM_stepsize)
 GIANT_sequence = GIANT_ADMM.run(iterations=iterations, stepsize=GIANT_stepsize)
 
+# Insert initial condition in the sequences
+gt_sequence = np.insert(gt_sequence, 0, x0, axis=0)
+ADMM_sequence = np.insert(ADMM_sequence, 0, x0, axis=0)
+GIANT_sequence = np.insert(GIANT_sequence, 0, x0, axis=0)
+
 print(f"Gradient tracking: agent {agent_id}: {
       gradient_tracking.get_result().flatten()}")
 print(f"ADMM-Tracking Gradient: agent {agent_id}: {
@@ -140,3 +148,5 @@ np.save(os.path.join(RESULTS_DIR, f"agent_{
         agent_id}_seq_admm.npy"), np.squeeze(ADMM_sequence))
 np.save(os.path.join(RESULTS_DIR, f"agent_{
         agent_id}_seq_giant.npy"), np.squeeze(GIANT_sequence))
+
+print(f"Agent {agent_id}: finished ")
