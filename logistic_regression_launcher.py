@@ -40,7 +40,6 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--seed', type=int, help='Seed', default=10)
 args = parser.parse_args()
 seed = args.seed
-print(f"Seed: {seed}")
 
 # Generate a random graph, common to all agents, and the corresponding
 # weights matrix

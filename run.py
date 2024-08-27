@@ -7,8 +7,10 @@ from sympy import prime
 NUMBER_OF_ITERATIONS = 50
 RESULTS_DIR_BASE = "logistic_regression_results"
 
-# Esegui 50 volte con seed diversi
-for i in range(1, NUMBER_OF_ITERATIONS + 1):
+# Run many times, each with different seeds
+i = 1
+while i < NUMBER_OF_ITERATIONS:
+    i += 1
     seed = prime(i)
 
     if not os.path.exists(RESULTS_DIR_BASE):
@@ -16,17 +18,20 @@ for i in range(1, NUMBER_OF_ITERATIONS + 1):
 
     command = f"mpirun -np 4 python3 logistic_regression_launcher.py --seed {
         seed}"
-    subprocess.run(command, shell=True)
+    try:
+        subprocess.run(command,
+                       shell=True,
+                       stdout=subprocess.DEVNULL,
+                       stderr=subprocess.DEVNULL)
+    except:
+        print("Error while running the script. Ignoring this seed...")
 
-    # Rinomina la cartella dei risultati
+    # Save results in a new results dir
     new_results_dir = f"{RESULTS_DIR_BASE}_{seed}"
-    if os.path.exists(RESULTS_DIR_BASE):
-        shutil.move(RESULTS_DIR_BASE, new_results_dir)
-    else:
-        print(f"Cartella {
-              RESULTS_DIR_BASE} non trovata. Assicurati che il processo generi questa cartella.")
+    if not os.path.exists(RESULTS_DIR_BASE):
+        print(f"Base results folder {RESULTS_DIR_BASE} not found. Exiting")
+        exit
 
-    print(f"Completata esecuzione {
-          seed+1}/{NUMBER_OF_ITERATIONS} con seed {seed}. Risultati salvati in {new_results_dir}")
+    shutil.move(RESULTS_DIR_BASE, new_results_dir)
 
-print("Tutte le esecuzioni sono state completate.")
+    print(f"Completed simulation {i}/{NUMBER_OF_ITERATIONS} with seed {seed}")
