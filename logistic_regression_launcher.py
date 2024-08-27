@@ -19,6 +19,7 @@ import argparse
 import dill as pickle
 import numpy as np
 import os
+import sys
 from mpi4py import MPI
 from disropt.agents import Agent
 from disropt.algorithms import SubgradientMethod, GradientTracking, DualDecomposition
@@ -125,11 +126,19 @@ GIANT_ADMM = GIANTADMM(
 )
 
 # Run the algorithms
-gt_sequence = gradient_tracking.run(
-    iterations=iterations, stepsize=GT_stepsize)
-ADMM_sequence = ADMM_tracking_gradient.run(
-    iterations=iterations, stepsize=ADMM_stepsize)
-GIANT_sequence = GIANT_ADMM.run(iterations=iterations, stepsize=GIANT_stepsize)
+try:
+    gt_sequence = gradient_tracking.run(
+        iterations=iterations, stepsize=GT_stepsize)
+    ADMM_sequence = ADMM_tracking_gradient.run(
+        iterations=iterations, stepsize=ADMM_stepsize)
+    GIANT_sequence = GIANT_ADMM.run(
+        iterations=iterations, stepsize=GIANT_stepsize)
+except Exception as e:
+    print(f"Agent {agent_id}: simulation failed with error '{e}'")
+    # Create an empty file with the seed as its name to signal an error
+    f = open(f"{seed}", "w")
+    f.close()
+    MPI.COMM_WORLD.Abort()
 
 # Insert initial condition in the sequences
 gt_sequence = np.insert(gt_sequence, 0, x0, axis=0)
@@ -161,5 +170,3 @@ np.save(os.path.join(RESULTS_DIR, f"agent_{
         agent_id}_seq_admm.npy"), np.squeeze(ADMM_sequence))
 np.save(os.path.join(RESULTS_DIR, f"agent_{
         agent_id}_seq_giant.npy"), np.squeeze(GIANT_sequence))
-
-print(f"Agent {agent_id}: finished ")
