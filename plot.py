@@ -75,5 +75,4 @@ for p, sequence in enumerate([gt_sequence, admm_sequence, giant_admm_sequence]):
                         gt_loss_sequence[i][:], color=colors[i])
             axs[1].set_yscale("log")
 
-
 plt.show()
