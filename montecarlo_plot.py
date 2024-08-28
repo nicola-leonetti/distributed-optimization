@@ -149,7 +149,7 @@ plt.semilogy(np.arange(iterations), avg_cost_error_admm,
              label='ADMM-Tracking Gradient')
 plt.semilogy(np.arange(iterations), avg_cost_error_gt,
              label='Gradient Tracking')
-plt.semilogy(np.arange(iterations), avg_solution_error_giant,
+plt.semilogy(np.arange(iterations), avg_cost_error_giant,
              label='GIANT-ADMM')
 plt.legend()
 
