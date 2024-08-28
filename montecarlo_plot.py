@@ -6,7 +6,6 @@ import numpy as np
 import pickle
 from disropt.problems import Problem
 
-NUMBER_OF_SIMULATIONS = 50
 RESULTS_DIR_BASE = "logistic_regression_results"
 
 # Initialize some numpy vectors, two for each algorithm (cost error and
@@ -19,7 +18,15 @@ avg_solution_error_admm = np.zeros((1001))
 avg_solution_error_gt = np.zeros((1001))
 avg_solution_error_giant = np.zeros((1001))
 
-for directory in filter(lambda d: d.startswith(RESULTS_DIR_BASE + "_"), os.listdir(".")):
+number_of_simulations = 0
+for d in os.listdir("."):
+    if d.startswith(RESULTS_DIR_BASE + "_"):
+        number_of_simulations += 1
+
+for directory in filter(lambda d: d.startswith(
+        RESULTS_DIR_BASE + "_"), os.listdir(".")):
+
+    print(number_of_simulations)
 
     # Read number_of_agents, iterations, size and seed
     with open(os.path.join(directory, 'info.pkl'), 'rb') as inp:
@@ -130,12 +137,12 @@ for directory in filter(lambda d: d.startswith(RESULTS_DIR_BASE + "_"), os.listd
     avg_cost_error_giant += solution_error_giant
 
 # Calculate the mean by dividing for the number of simulations
-avg_cost_error_admm /= NUMBER_OF_SIMULATIONS
-avg_cost_error_gt /= NUMBER_OF_SIMULATIONS
-avg_cost_error_giant /= NUMBER_OF_SIMULATIONS
-avg_solution_error_admm /= NUMBER_OF_SIMULATIONS
-avg_solution_error_gt /= NUMBER_OF_SIMULATIONS
-avg_solution_error_giant /= NUMBER_OF_SIMULATIONS
+avg_cost_error_admm /= number_of_simulations
+avg_cost_error_gt /= number_of_simulations
+avg_cost_error_giant /= number_of_simulations
+avg_solution_error_admm /= number_of_simulations
+avg_solution_error_gt /= number_of_simulations
+avg_solution_error_giant /= number_of_simulations
 
 # Plot
 
