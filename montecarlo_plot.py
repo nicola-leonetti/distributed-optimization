@@ -26,8 +26,6 @@ for d in os.listdir("."):
 for directory in filter(lambda d: d.startswith(
         RESULTS_DIR_BASE + "_"), os.listdir(".")):
 
-    print(number_of_simulations)
-
     # Read number_of_agents, iterations, size and seed
     with open(os.path.join(directory, 'info.pkl'), 'rb') as inp:
         info = pickle.load(inp)
@@ -134,7 +132,7 @@ for directory in filter(lambda d: d.startswith(
     # Add everything to the respective global result
     avg_solution_error_admm += solution_error_admm
     avg_solution_error_gt += solution_error_gt
-    avg_cost_error_giant += solution_error_giant
+    avg_solution_error_giant += solution_error_giant
 
 # Calculate the mean by dividing for the number of simulations
 avg_cost_error_admm /= number_of_simulations
@@ -146,7 +144,7 @@ avg_solution_error_giant /= number_of_simulations
 
 # Plot
 
-# Maximum cost error
+# Maximum average cost error
 plt.figure()
 plt.title('Maximum average cost error (among agents)')
 plt.xlabel(r"iteration $k$")
@@ -160,7 +158,7 @@ plt.semilogy(np.arange(iterations), avg_cost_error_giant,
              label='GIANT-ADMM')
 plt.legend()
 
-# Maximum solution error
+# Maximum average solution error
 plt.figure()
 plt.title('Maximum average solution error (among agents)')
 plt.xlabel(r"iteration $k$")
