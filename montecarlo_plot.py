@@ -8,15 +8,31 @@ from disropt.problems import Problem
 
 RESULTS_DIR_BASE = "logistic_regression_results"
 
-# Initialize some numpy vectors, two for each algorithm (cost error and
-# solution error) to store the average result sequences of all the simulations
+# Initialize numpy arrays to store average result sequences and their standard deviations
 avg_cost_error_admm = np.zeros((1001))
 avg_cost_error_gt = np.zeros((1001))
 avg_cost_error_giant = np.zeros((1001))
 
+std_cost_error_admm = np.zeros((1001))
+std_cost_error_gt = np.zeros((1001))
+std_cost_error_giant = np.zeros((1001))
+
 avg_solution_error_admm = np.zeros((1001))
 avg_solution_error_gt = np.zeros((1001))
 avg_solution_error_giant = np.zeros((1001))
+
+std_solution_error_admm = np.zeros((1001))
+std_solution_error_gt = np.zeros((1001))
+std_solution_error_giant = np.zeros((1001))
+
+# Store all cost and solution errors to compute standard deviation later
+all_cost_errors_admm = []
+all_cost_errors_gt = []
+all_cost_errors_giant = []
+
+all_solution_errors_admm = []
+all_solution_errors_gt = []
+all_solution_errors_giant = []
 
 number_of_simulations = 0
 for d in os.listdir("."):
@@ -110,6 +126,11 @@ for directory in filter(lambda d: d.startswith(
     cost_error_gt = np.amax(cost_error_gt, axis=0)
     cost_error_giant = np.amax(cost_error_giant, axis=0)
 
+    # Store all cost errors
+    all_cost_errors_admm.append(cost_error_admm)
+    all_cost_errors_gt.append(cost_error_gt)
+    all_cost_errors_giant.append(cost_error_giant)
+
     # Add everything to the respective global result
     avg_cost_error_admm += cost_error_admm
     avg_cost_error_gt += cost_error_gt
@@ -129,6 +150,11 @@ for directory in filter(lambda d: d.startswith(
     solution_error_gt = np.amax(solution_error_gt, axis=0)
     solution_error_giant = np.amax(solution_error_giant, axis=0)
 
+    # Store all solution errors
+    all_solution_errors_admm.append(solution_error_admm)
+    all_solution_errors_gt.append(solution_error_gt)
+    all_solution_errors_giant.append(solution_error_giant)
+
     # Add everything to the respective global result
     avg_solution_error_admm += solution_error_admm
     avg_solution_error_gt += solution_error_gt
@@ -142,6 +168,14 @@ avg_solution_error_admm /= number_of_simulations
 avg_solution_error_gt /= number_of_simulations
 avg_solution_error_giant /= number_of_simulations
 
+# Calculate the standard deviation
+std_cost_error_admm = np.std(all_cost_errors_admm, axis=0)
+std_cost_error_gt = np.std(all_cost_errors_gt, axis=0)
+std_cost_error_giant = np.std(all_cost_errors_giant, axis=0)
+std_solution_error_admm = np.std(all_solution_errors_admm, axis=0)
+std_solution_error_gt = np.std(all_solution_errors_gt, axis=0)
+std_solution_error_giant = np.std(all_solution_errors_giant, axis=0)
+
 # Plot
 
 # Maximum average cost error
@@ -152,10 +186,15 @@ plt.ylabel(
     r"$\max_{i} \: \left|(\sum_{j=1}^N f_j(x_i^k) - f^\star)/f^\star \right|$")
 plt.semilogy(np.arange(iterations), avg_cost_error_admm,
              label='ADMM-Tracking Gradient')
+plt.fill_between(np.arange(iterations), avg_cost_error_admm - std_cost_error_admm,
+                 avg_cost_error_admm + std_cost_error_admm, alpha=0.2)
 plt.semilogy(np.arange(iterations), avg_cost_error_gt,
              label='Gradient Tracking')
-plt.semilogy(np.arange(iterations), avg_cost_error_giant,
-             label='GIANT-ADMM')
+plt.fill_between(np.arange(iterations), avg_cost_error_gt - std_cost_error_gt,
+                 avg_cost_error_gt + std_cost_error_gt, alpha=0.2)
+plt.semilogy(np.arange(iterations), avg_cost_error_giant, label='GIANT-ADMM')
+plt.fill_between(np.arange(iterations), avg_cost_error_giant - std_cost_error_giant,
+                 avg_cost_error_giant + std_cost_error_giant, alpha=0.2)
 plt.legend()
 
 # Maximum average solution error
@@ -165,11 +204,16 @@ plt.xlabel(r"iteration $k$")
 plt.ylabel(r"$\max_{i} \: \|x_i^k - x^\star\|$")
 plt.semilogy(np.arange(iterations), avg_solution_error_admm,
              label='ADMM-Tracking Gradient')
-plt.semilogy(np.arange(iterations),
-             avg_solution_error_gt, label='Gradient Tracking')
+plt.fill_between(np.arange(iterations), avg_solution_error_admm - std_solution_error_admm,
+                 avg_solution_error_admm + std_solution_error_admm, alpha=0.2)
+plt.semilogy(np.arange(iterations), avg_solution_error_gt,
+             label='Gradient Tracking')
+plt.fill_between(np.arange(iterations), avg_solution_error_gt - std_solution_error_gt,
+                 avg_solution_error_gt + std_solution_error_gt, alpha=0.2)
 plt.semilogy(np.arange(iterations),
              avg_solution_error_giant, label='GIANT-ADMM')
-
+plt.fill_between(np.arange(iterations), avg_solution_error_giant - std_solution_error_giant,
+                 avg_solution_error_giant + std_solution_error_giant, alpha=0.2)
 plt.legend()
 
 plt.show()
