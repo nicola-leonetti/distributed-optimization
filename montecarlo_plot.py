@@ -178,6 +178,10 @@ std_solution_error_giant = np.std(all_solution_errors_giant, axis=0)
 
 # Plot
 
+# When plotting confidence bands, the standard deviation is multiplied
+# this factor
+confidence_band_scale = 1/3
+
 # Maximum average cost error
 plt.figure()
 plt.title('Maximum average cost error (among agents)')
@@ -186,15 +190,15 @@ plt.ylabel(
     r"$\max_{i} \: \left|(\sum_{j=1}^N f_j(x_i^k) - f^\star)/f^\star \right|$")
 plt.semilogy(np.arange(iterations), avg_cost_error_admm,
              label='ADMM-Tracking Gradient')
-plt.fill_between(np.arange(iterations), avg_cost_error_admm - std_cost_error_admm,
-                 avg_cost_error_admm + std_cost_error_admm, alpha=0.2)
+plt.fill_between(np.arange(iterations), avg_cost_error_admm - confidence_band_scale*std_cost_error_admm,
+                 avg_cost_error_admm + confidence_band_scale*std_cost_error_admm, alpha=0.2)
 plt.semilogy(np.arange(iterations), avg_cost_error_gt,
              label='Gradient Tracking')
-plt.fill_between(np.arange(iterations), avg_cost_error_gt - std_cost_error_gt,
-                 avg_cost_error_gt + std_cost_error_gt, alpha=0.2)
+plt.fill_between(np.arange(iterations), avg_cost_error_gt - confidence_band_scale*std_cost_error_gt,
+                 avg_cost_error_gt + confidence_band_scale*std_cost_error_gt, alpha=0.2)
 plt.semilogy(np.arange(iterations), avg_cost_error_giant, label='GIANT-ADMM')
-plt.fill_between(np.arange(iterations), avg_cost_error_giant - std_cost_error_giant,
-                 avg_cost_error_giant + std_cost_error_giant, alpha=0.2)
+plt.fill_between(np.arange(iterations), avg_cost_error_giant - confidence_band_scale*std_cost_error_giant,
+                 avg_cost_error_giant + confidence_band_scale*std_cost_error_giant, alpha=0.2)
 plt.legend()
 
 # Maximum average solution error
@@ -204,16 +208,16 @@ plt.xlabel(r"iteration $k$")
 plt.ylabel(r"$\max_{i} \: \|x_i^k - x^\star\|$")
 plt.semilogy(np.arange(iterations), avg_solution_error_admm,
              label='ADMM-Tracking Gradient')
-plt.fill_between(np.arange(iterations), avg_solution_error_admm - std_solution_error_admm,
-                 avg_solution_error_admm + std_solution_error_admm, alpha=0.2)
+plt.fill_between(np.arange(iterations), avg_solution_error_admm - confidence_band_scale*std_solution_error_admm,
+                 avg_solution_error_admm + confidence_band_scale*std_solution_error_admm, alpha=0.2)
 plt.semilogy(np.arange(iterations), avg_solution_error_gt,
              label='Gradient Tracking')
-plt.fill_between(np.arange(iterations), avg_solution_error_gt - std_solution_error_gt,
-                 avg_solution_error_gt + std_solution_error_gt, alpha=0.2)
+plt.fill_between(np.arange(iterations), avg_solution_error_gt - confidence_band_scale*std_solution_error_gt,
+                 avg_solution_error_gt + confidence_band_scale*std_solution_error_gt, alpha=0.2)
 plt.semilogy(np.arange(iterations),
              avg_solution_error_giant, label='GIANT-ADMM')
-plt.fill_between(np.arange(iterations), avg_solution_error_giant - std_solution_error_giant,
-                 avg_solution_error_giant + std_solution_error_giant, alpha=0.2)
+plt.fill_between(np.arange(iterations), avg_solution_error_giant - confidence_band_scale*std_solution_error_giant,
+                 avg_solution_error_giant + confidence_band_scale*std_solution_error_giant, alpha=0.2)
 plt.legend()
 
 plt.show()
