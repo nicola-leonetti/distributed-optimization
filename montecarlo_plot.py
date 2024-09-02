@@ -57,15 +57,30 @@ for directory in filter(lambda d: d.startswith(
     gt_sequence = np.zeros((number_of_agents, iterations, size))
     GIANT_sequence = np.zeros((number_of_agents, iterations, size))
     local_function = {}
+    points = []
+    labels = []
     for i in range(number_of_agents):
+        # Load sequences
         ADMM_sequence[i, :, :] = np.load(os.path.join(
             directory, f"agent_{i}_seq_admm.npy"))
         gt_sequence[i, :, :] = np.load(os.path.join(
             directory, f"agent_{i}_seq_gradtr.npy"))
         GIANT_sequence[i, :, :] = np.load(os.path.join(
             directory, f"agent_{i}_seq_giant.npy"))
+
+        # Load local function
         with open(os.path.join(directory, f'agent_{i}_func.pkl'), 'rb') as inp:
             local_function[i] = pickle.load(inp)
+
+        # Load points and labels
+        points.append(np.load(os.path.join(
+            directory, f"agent_{i}_points.npy")))
+        labels.append(np.load(os.path.join(
+            directory, f"agent_{i}_labels.npy")))
+
+    # Combinate points and labels of each agent together
+    all_points = np.hstack(points)
+    all_labels = np.vstack(labels).flatten()
 
     # Calculate global_obj_function
     global_obj_func = 0
@@ -160,6 +175,25 @@ for directory in filter(lambda d: d.startswith(
     avg_solution_error_gt += solution_error_gt
     avg_solution_error_giant += solution_error_giant
 
+    # Plot all the points, colored according to each point's label
+    plt.figure(figsize=(8, 6))
+    plt.title('Logistic Regression Decision Boundary and Data Points')
+    plt.xlabel('Feature 1')
+    plt.ylabel('Feature 2')
+    # Plot all points of all agents
+    plt.scatter(all_points[0, all_labels == 1], all_points[1,
+                all_labels == 1], color='blue', marker='o', label='Class 1')
+    plt.scatter(all_points[0, all_labels == -1], all_points[1,
+                all_labels == -1], color='red', marker='x', label='Class -1')
+    # Plot the decision boundary from the problem's solution
+    x_vals = np.linspace(
+        min(all_points[0, :]) - 1, max(all_points[0, :]) + 1, 200)
+    y_vals = -(problem_solution[0] * x_vals +
+               problem_solution[2]) / problem_solution[1]
+    plt.plot(x_vals, y_vals, 'k--', label='Decision Boundary')
+    plt.legend()
+    plt.grid(True)
+
 # Calculate the mean by dividing for the number of simulations
 avg_cost_error_admm /= number_of_simulations
 avg_cost_error_gt /= number_of_simulations
@@ -219,5 +253,6 @@ plt.semilogy(np.arange(iterations),
 plt.fill_between(np.arange(iterations), avg_solution_error_giant - confidence_band_scale*std_solution_error_giant,
                  avg_solution_error_giant + confidence_band_scale*std_solution_error_giant, alpha=0.2)
 plt.legend()
+
 
 plt.show()

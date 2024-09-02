@@ -170,3 +170,6 @@ np.save(os.path.join(RESULTS_DIR, f"agent_{
         agent_id}_seq_admm.npy"), np.squeeze(ADMM_sequence))
 np.save(os.path.join(RESULTS_DIR, f"agent_{
         agent_id}_seq_giant.npy"), np.squeeze(GIANT_sequence))
+
+np.save(os.path.join(RESULTS_DIR, f"agent_{agent_id}_points.npy"), points)
+np.save(os.path.join(RESULTS_DIR, f"agent_{agent_id}_labels.npy"), labels)
