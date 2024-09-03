@@ -214,7 +214,7 @@ std_solution_error_giant = np.std(all_solution_errors_giant, axis=0)
 
 # When plotting confidence bands, the standard deviation is multiplied
 # this factor
-confidence_band_scale = 1/3
+confidence_band_scale = 1/5
 
 # Maximum average cost error
 plt.figure()
