@@ -7,6 +7,7 @@ import pickle
 from disropt.problems import Problem
 
 RESULTS_DIR_BASE = "logistic_regression_results"
+epsilon = 1e-6  # Definisci un piccolo epsilon da sommare
 
 # Initialize numpy arrays to store average result sequences and their standard deviations
 avg_cost_error_admm = np.zeros((1001))
@@ -222,17 +223,18 @@ plt.title('Maximum average cost error (among agents)')
 plt.xlabel(r"iteration $k$")
 plt.ylabel(
     r"$\max_{i} \: \left|(\sum_{j=1}^N f_j(x_i^k) - f^\star)/f^\star \right|$")
-plt.semilogy(np.arange(iterations), avg_cost_error_admm,
+plt.semilogy(np.arange(iterations), avg_cost_error_admm + epsilon,  # Somma epsilon ai risultati
              label='ADMM-Tracking Gradient')
-plt.fill_between(np.arange(iterations), avg_cost_error_admm - confidence_band_scale*std_cost_error_admm,
-                 avg_cost_error_admm + confidence_band_scale*std_cost_error_admm, alpha=0.2)
-plt.semilogy(np.arange(iterations), avg_cost_error_gt,
+plt.fill_between(np.arange(iterations), avg_cost_error_admm - confidence_band_scale*std_cost_error_admm + epsilon,
+                 avg_cost_error_admm + confidence_band_scale*std_cost_error_admm + epsilon, alpha=0.2)
+plt.semilogy(np.arange(iterations), avg_cost_error_gt + epsilon,  # Somma epsilon ai risultati
              label='Gradient Tracking')
-plt.fill_between(np.arange(iterations), avg_cost_error_gt - confidence_band_scale*std_cost_error_gt,
-                 avg_cost_error_gt + confidence_band_scale*std_cost_error_gt, alpha=0.2)
-plt.semilogy(np.arange(iterations), avg_cost_error_giant, label='GIANT-ADMM')
-plt.fill_between(np.arange(iterations), avg_cost_error_giant - confidence_band_scale*std_cost_error_giant,
-                 avg_cost_error_giant + confidence_band_scale*std_cost_error_giant, alpha=0.2)
+plt.fill_between(np.arange(iterations), avg_cost_error_gt - confidence_band_scale*std_cost_error_gt + epsilon,
+                 avg_cost_error_gt + confidence_band_scale*std_cost_error_gt + epsilon, alpha=0.2)
+plt.semilogy(np.arange(iterations), avg_cost_error_giant + epsilon,  # Somma epsilon ai risultati
+             label='GIANT-ADMM')
+plt.fill_between(np.arange(iterations), avg_cost_error_giant - confidence_band_scale*std_cost_error_giant + epsilon,
+                 avg_cost_error_giant + confidence_band_scale*std_cost_error_giant + epsilon, alpha=0.2)
 plt.legend()
 
 # Maximum average solution error
@@ -240,19 +242,19 @@ plt.figure()
 plt.title('Maximum average solution error (among agents)')
 plt.xlabel(r"iteration $k$")
 plt.ylabel(r"$\max_{i} \: \|x_i^k - x^\star\|$")
-plt.semilogy(np.arange(iterations), avg_solution_error_admm,
+plt.semilogy(np.arange(iterations), avg_solution_error_admm + epsilon,  # Somma epsilon ai risultati
              label='ADMM-Tracking Gradient')
-plt.fill_between(np.arange(iterations), avg_solution_error_admm - confidence_band_scale*std_solution_error_admm,
-                 avg_solution_error_admm + confidence_band_scale*std_solution_error_admm, alpha=0.2)
-plt.semilogy(np.arange(iterations), avg_solution_error_gt,
+plt.fill_between(np.arange(iterations), avg_solution_error_admm - confidence_band_scale*std_solution_error_admm + epsilon,
+                 avg_solution_error_admm + confidence_band_scale*std_solution_error_admm + epsilon, alpha=0.2)
+plt.semilogy(np.arange(iterations), avg_solution_error_gt + epsilon,  # Somma epsilon ai risultati
              label='Gradient Tracking')
-plt.fill_between(np.arange(iterations), avg_solution_error_gt - confidence_band_scale*std_solution_error_gt,
-                 avg_solution_error_gt + confidence_band_scale*std_solution_error_gt, alpha=0.2)
+plt.fill_between(np.arange(iterations), avg_solution_error_gt - confidence_band_scale*std_solution_error_gt + epsilon,
+                 avg_solution_error_gt + confidence_band_scale*std_solution_error_gt + epsilon, alpha=0.2)
 plt.semilogy(np.arange(iterations),
-             avg_solution_error_giant, label='GIANT-ADMM')
-plt.fill_between(np.arange(iterations), avg_solution_error_giant - confidence_band_scale*std_solution_error_giant,
-                 avg_solution_error_giant + confidence_band_scale*std_solution_error_giant, alpha=0.2)
+             avg_solution_error_giant + epsilon,  # Somma epsilon ai risultati
+             label='GIANT-ADMM')
+plt.fill_between(np.arange(iterations), avg_solution_error_giant - confidence_band_scale*std_solution_error_giant + epsilon,
+                 avg_solution_error_giant + confidence_band_scale*std_solution_error_giant + epsilon, alpha=0.2)
 plt.legend()
-
 
 plt.show()
