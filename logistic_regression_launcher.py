@@ -45,7 +45,7 @@ seed = args.seed
 # Generate a random graph, common to all agents, and the corresponding
 # weights matrix
 np.random.seed(seed)
-graph = binomial_random_graph(number_of_agents, p=0.3, seed=1)
+graph = binomial_random_graph(number_of_agents, p=0.3, seed=seed)
 W = metropolis_hastings(graph)
 # Initialize a different RNG for each agent
 np.random.seed(seed*agent_id)
