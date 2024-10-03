@@ -211,6 +211,29 @@ std_solution_error_admm = np.std(all_solution_errors_admm, axis=0)
 std_solution_error_gt = np.std(all_solution_errors_gt, axis=0)
 std_solution_error_giant = np.std(all_solution_errors_giant, axis=0)
 
+# Maximum consensus error
+consensus_error_admm = np.zeros(iterations)
+consensus_error_gt = np.zeros(iterations)
+consensus_error_giant = np.zeros(iterations)
+
+# Calcolo dell'errore di consenso per ogni iterazione
+for t in range(iterations):
+    # Calcola la media delle soluzioni per ogni iterazione
+    avg_solution_admm = np.mean(ADMM_sequence[:, t, :], axis=0)
+    avg_solution_gt = np.mean(gt_sequence[:, t, :], axis=0)
+    avg_solution_giant = np.mean(GIANT_sequence[:, t, :], axis=0)
+
+    # Calcola la norma della differenza tra la soluzione di ciascun agente e la media
+    consensus_error_admm[t] = np.max(
+        np.linalg.norm(ADMM_sequence[:, t, :] - avg_solution_admm, axis=1)
+    )
+    consensus_error_gt[t] = np.max(
+        np.linalg.norm(gt_sequence[:, t, :] - avg_solution_gt, axis=1)
+    )
+    consensus_error_giant[t] = np.max(
+        np.linalg.norm(GIANT_sequence[:, t, :] - avg_solution_giant, axis=1)
+    )
+
 # Plot
 
 # When plotting confidence bands, the standard deviation is multiplied
@@ -220,9 +243,9 @@ confidence_band_scale = 1/5
 # Maximum average cost error
 plt.figure()
 plt.title('Maximum average cost error (among agents)')
-plt.xlabel(r"iteration $k$")
+plt.xlabel(r"iteration $t$")
 plt.ylabel(
-    r"$\max_{i} \: \left|(\sum_{j=1}^N f_j(x_i^k) - f^\star)/f^\star \right|$")
+    r"$\max_{i} \: \left|(\sum_{j=1}^N f_j(x_i^t) - f^\star)/f^\star \right|$")
 plt.semilogy(np.arange(iterations), avg_cost_error_admm + epsilon,  # Somma epsilon ai risultati
              label='ADMM-Tracking Gradient')
 plt.fill_between(np.arange(iterations), avg_cost_error_admm - confidence_band_scale*std_cost_error_admm + epsilon,
@@ -240,8 +263,8 @@ plt.legend()
 # Maximum average solution error
 plt.figure()
 plt.title('Maximum average solution error (among agents)')
-plt.xlabel(r"iteration $k$")
-plt.ylabel(r"$\max_{i} \: \|x_i^k - x^\star\|$")
+plt.xlabel(r"iteration $t$")
+plt.ylabel(r"$\max_{i} \: \|x_i^t - x^\star\|$")
 plt.semilogy(np.arange(iterations), avg_solution_error_admm + epsilon,  # Somma epsilon ai risultati
              label='ADMM-Tracking Gradient')
 plt.fill_between(np.arange(iterations), avg_solution_error_admm - confidence_band_scale*std_solution_error_admm + epsilon,
@@ -256,5 +279,20 @@ plt.semilogy(np.arange(iterations),
 plt.fill_between(np.arange(iterations), avg_solution_error_giant - confidence_band_scale*std_solution_error_giant + epsilon,
                  avg_solution_error_giant + confidence_band_scale*std_solution_error_giant + epsilon, alpha=0.2)
 plt.legend()
+
+# Maximum consensus error
+# Plot dell'errore di consenso massimo
+plt.figure()
+plt.title('Maximum average consensus error (among agents)')
+plt.xlabel(r"iteration $t$")
+plt.ylabel(r"$\max_{i} \: \| x^t - \bar{x}^t \|$")
+plt.semilogy(np.arange(iterations), consensus_error_admm + epsilon,
+             label='ADMM-Tracking Gradient')
+plt.semilogy(np.arange(iterations), consensus_error_gt + epsilon,
+             label='Gradient Tracking')
+plt.semilogy(np.arange(iterations), consensus_error_giant + epsilon,
+             label='GIANT-ADMM')
+plt.legend()
+plt.grid(True)
 
 plt.show()

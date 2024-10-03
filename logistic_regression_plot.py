@@ -74,12 +74,17 @@ for i in range(number_of_agents):
             cost_ii_tt_gradtr.item() - cost_centr.item())
         cost_err_giant[i, t] = abs(cost_ii_tt_giant.item() - cost_centr.item())
 
+# compute maximum consensus error
+avg_admm_sequence = np.mean(ADMM_sequence, axis=0)
+avg_gt_sequence = np.mean(gt_sequence, axis=0)
+avg_giant_sequence = np.mean(GIANT_sequence, axis=0)
+
 # plot maximum cost error
 plt.figure()
 plt.title('Maximum cost error (among agents)')
-plt.xlabel(r"iteration $k$")
+plt.xlabel(r"iteration $t$")
 plt.ylabel(
-    r"$\max_{i} \: \left|(\sum_{j=1}^N f_j(x_i^k) - f^\star)/f^\star \right|$")
+    r"$\max_{i} \: \left|(\sum_{j=1}^N f_j(x_i^t) - f^\star)/f^\star \right|$")
 plt.semilogy(np.arange(iters), np.amax(cost_err_admm /
              cost_centr, axis=0), label='ADMM-Tracking Gradient')
 plt.semilogy(np.arange(iters), np.amax(cost_err_gradtr /
@@ -98,15 +103,14 @@ giant_solution_error = np.linalg.norm(
 
 plt.figure()
 plt.title('Maximum solution error (among agents)')
-plt.xlabel(r"iteration $k$")
-plt.ylabel(r"$\max_{i} \: \|x_i^k - x^\star\|$")
+plt.xlabel(r"iteration $t$")
+plt.ylabel(r"$\max_{i} \: \|x_i^t - x^\star\|$")
 plt.semilogy(np.arange(iters), np.amax(admm_solution_error, axis=0),
              label='ADMM-Tracking Gradient')
 plt.semilogy(np.arange(iters), np.amax(
     gt_solution_error, axis=0), label='Gradient Tracking')
 plt.semilogy(np.arange(iters), np.amax(
     giant_solution_error, axis=0), label='GIANT-ADMM')
-
 plt.legend()
 
 plt.show()

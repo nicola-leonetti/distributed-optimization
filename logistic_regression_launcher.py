@@ -96,7 +96,7 @@ agent.set_problem(problem)
 # Initialize the agents' initial conditions with random values
 # In order to make the simulation fair, each agent should start with the
 # same random value as its initial condition
-np.random.seed(sample_space_dimension)
+np.random.seed(seed)
 x0 = 5*np.random.rand(sample_space_dimension+1, 1)
 
 gradient_tracking = GradientTracking(
